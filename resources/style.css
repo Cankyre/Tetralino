@@ -1,0 +1,53 @@
+body {
+  background: #202028;
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 2em;
+  text-align: center;
+
+  display: flex;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+canvas {
+  margin: 0 10px 0 10px;
+  border: solid 0.2em #fff;
+}
+
+.game {
+  flex: 3;
+  margin-left: 20vw;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+#tetris {
+  height: 90vh;
+  position: static;
+}
+
+#nextQueue {
+  height: 67.5vh;
+  position: static;
+}
+
+#hold {
+  height: 22.5vh;
+  margin-right: auto;
+  position: static;
+}
+
+p {
+  font-size: small;
+}
+
+.inputs {
+  margin-top: 20vh;
+  margin-left: 10vw;
+  margin-right: 10vw;
+}

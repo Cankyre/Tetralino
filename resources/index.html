@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>Tetris</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="game">
+      <div id="score"></div>
+      <div class="board">
+        <canvas id="hold" width="100" height="100"></canvas>
+        <canvas id="tetris" width="200" height="400"></canvas>
+        <canvas id="nextQueue" width="100" height="300"></canvas>
+      </div>
+    </div>
+    <div class="inputs">
+      <div class="field">
+        <input type="text" title="inputs" id="input" />
+        <button id="keysSubmit">Submit</button>
+      </div>
+      <p>We'll see later</p>
+    </div>
+    <script src="./js/constants.js"></script>
+    <script src="./js/controls.js"></script>
+    <script src="./js/tetris.js"></script>
+  </body>
+</html>
