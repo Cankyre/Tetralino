@@ -98,7 +98,30 @@ const matrixes = {
   ],
 };
 
+const colors = [
+  null,
+  "#0DC2FF", // I
+  "orange", // L
+  "#0D00ff", // J
+  "#ffff00", // O
+  "#FF000D", // Z
+  "#00ff00", // S
+  "purple", // T
+  "#888888", // Ghost, unusable hold etc.
+];
 
 const DAS = 83
 const ARR = 6
 const SDRR = Infinity
+
+const keys = [
+  "ArrowLeft", // Move left
+  "ArrowRight", // Move right
+  "ArrowDown", // Soft drop
+  " ", // Hard drop
+  "w", // CCW
+  "c", // CW
+  "x", // 180°
+  "Shift", // Hold
+  "r", // Reset
+]

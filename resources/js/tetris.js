@@ -16,6 +16,8 @@ function arenaSweep() {
 
     rowCount += 1;
   }
+  lines += rowCount
+  document.getElementById("lines").innerText = "Lines cleared: " + lines
   switch (rowCount) {
     case 1:
       player.score += 100;
@@ -163,7 +165,7 @@ function drawNext(nexts, fixedColor) {
 
 /**
  * Draws the hold jpp
- * @param {number} fixedColor
+ * @param {string} fixedColor
  * @returns
  */
 
@@ -197,7 +199,7 @@ function draw() {
   drawGhostPiece();
   drawNext(bag);
   drawHold(justHold ? "#888888" : undefined);
-  drawMatrix(arena, { x: 0, y: 0 });
+  drawMatrix(arena, { x: 0, y: 0 }, lines >= 40 ? "#888888" : undefined);
   drawMatrix(player.matrix, player.pos);
 }
 
@@ -267,9 +269,6 @@ function rotate(matrix, dir) {
  */
 
 function getNextPiece() {
-  /* if (bag.length <= 0) {
-        bag = nextbag;
-    } */
   while (bag.length <= 6) {
     if (nextbag.length <= 0) {
       nextbag = createBag();
@@ -331,6 +330,7 @@ function playerMove(offset) {
  */
 
 function playerReset(type) {
+  pieces += type ? 0 : 1
   if (disableJustHold) {
     justHold = false;
     disableJustHold = false;
@@ -349,6 +349,9 @@ function playerReset(type) {
       : player.matrix[0].length / 2 + 1) |
       0);
   if (collide(arena, player)) {
+    pieces = 0
+    lines = 0
+    startTime = Date.now()
     bag = [];
     nextbag = [];
     holdPiece = null;
@@ -365,26 +368,33 @@ function playerReset(type) {
  */
 
 function playerRotate(dir) {
-  const table = player.pieceType == "I" ? ISRS : regularSRS;
-  var endRotate =
-    player.rotation + dir < 0
-      ? player.rotation + dir + 4
-      : player.rotation + dir;
-  endRotate %= 4;
-  for (var rotation in table[player.rotation]) {
-    player.pos.x +=
-      table[player.rotation][rotation][0] - table[endRotate][rotation][0];
-    player.pos.y +=
-      table[player.rotation][rotation][1] - table[endRotate][rotation][1];
-    rotate(player.matrix, dir);
+  if (dir == 2) {
+    rotate(player.matrix, dir)
     if (collide(arena, player)) {
-      rotate(player.matrix, -dir);
-      player.pos.x -=
+      rotate(player.matrix, dir);
+    }
+  } else {
+    const table = player.pieceType == "I" ? ISRS : regularSRS;
+    var endRotate =
+      player.rotation + dir < 0
+        ? player.rotation + dir + 4
+        : player.rotation + dir;
+    endRotate %= 4;
+    for (var rotation in table[player.rotation]) {
+      player.pos.x +=
         table[player.rotation][rotation][0] - table[endRotate][rotation][0];
-      player.pos.y -=
+      player.pos.y +=
         table[player.rotation][rotation][1] - table[endRotate][rotation][1];
-    } else {
-      break;
+      rotate(player.matrix, dir);
+      if (collide(arena, player)) {
+        rotate(player.matrix, -dir);
+        player.pos.x -=
+          table[player.rotation][rotation][0] - table[endRotate][rotation][0];
+        player.pos.y -=
+          table[player.rotation][rotation][1] - table[endRotate][rotation][1];
+      } else {
+        break;
+      }
     }
   }
 }
@@ -408,7 +418,10 @@ function update(time = 0) {
   }
 
   lastTime = time;
-
+  if (lines < 40) {
+    document.getElementById("time").innerText = `Time elapsed: ${Math.floor((Date.now() - startTime) / 60000)}:${(Date.now() - startTime) / 1000}`
+    document.getElementById("pps").innerText = "PPS: " + (pieces / ((Date.now() - startTime) / 1000)).toFixed(2)
+  }
   draw();
   requestAnimationFrame(update);
   updateScore();
@@ -423,18 +436,6 @@ function updateScore() {
   document.getElementById("score").innerText = player.score;
 }
 
-const colors = [
-  null,
-  "#0DC2FF",
-  "orange",
-  "#0D00ff",
-  "#ffff00",
-  "#FF000D",
-  "#00ff00",
-  "purple",
-  "#888888",
-];
-
 const arena = createMatrix(10, 20);
 
 const player = {
@@ -447,6 +448,8 @@ const player = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+  startTime = Date.now()
+  pieces = 1
   canvas = document.getElementById("tetris");
   context = canvas.getContext("2d");
 
@@ -464,19 +467,10 @@ document.addEventListener("DOMContentLoaded", () => {
   btn.onclick = saveKeys;
   input = document.getElementById("input");
 
+  lines = 0;
+
   (bag = []),
     (nextbag = []),
-    (keys = [
-      "ArrowLeft",
-      "ArrowRight",
-      "ArrowDown",
-      " ",
-      "w",
-      "c",
-      "x",
-      "Shift",
-      "r",
-    ]);
   holdPiece = null;
   justHold = false;
   disableJustHold = false;
