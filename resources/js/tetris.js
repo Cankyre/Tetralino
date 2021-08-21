@@ -16,8 +16,8 @@ function arenaSweep() {
 
     rowCount += 1;
   }
-  lines += rowCount
-  document.getElementById("lines").innerText = "Lines cleared: " + lines
+  lines += rowCount;
+  document.getElementById("lines").innerText = "Lines cleared: " + lines;
   switch (rowCount) {
     case 1:
       player.score += 100;
@@ -146,20 +146,19 @@ function drawGhostPiece() {
 
 function drawNext(nexts, fixedColor) {
   for (var next in nexts.slice(0, 5)) {
-    createPiece(nexts[next])
-      .forEach((row, i) => {
-        row.forEach((value, x) => {
-          if (value !== 0) {
-            nextctx.fillStyle = fixedColor || colors[value];
-            nextctx.fillRect(
-              x + (nextQueue.width / 40 - row.length / 2),
-              1 + 2.5 * next + i,
-              1,
-              1
-            );
-          }
-        });
+    createPiece(nexts[next]).forEach((row, i) => {
+      row.forEach((value, x) => {
+        if (value !== 0) {
+          nextctx.fillStyle = fixedColor || colors[value];
+          nextctx.fillRect(
+            x + (nextQueue.width / 40 - row.length / 2),
+            1 + 2.5 * next + i,
+            1,
+            1
+          );
+        }
       });
+    });
   }
 }
 
@@ -171,15 +170,14 @@ function drawNext(nexts, fixedColor) {
 
 function drawHold(fixedColor) {
   if (!holdPiece) return;
-  createPiece(holdPiece)
-    .forEach((row, i) => {
-      row.forEach((value, x) => {
-        if (value !== 0) {
-          holdctx.fillStyle = fixedColor || colors[value];
-          holdctx.fillRect(x + (hold.width / 40 - row.length / 2), 1 + i, 1, 1);
-        }
-      });
+  createPiece(holdPiece).forEach((row, i) => {
+    row.forEach((value, x) => {
+      if (value !== 0) {
+        holdctx.fillStyle = fixedColor || colors[value];
+        holdctx.fillRect(x + (hold.width / 40 - row.length / 2), 1 + i, 1, 1);
+      }
     });
+  });
 }
 
 /**
@@ -290,8 +288,8 @@ function playerDrop(score, c) {
   if (collide(arena, player)) {
     player.pos.y--;
     if (c) {
-        player.score -= score;
-        return false
+      player.score -= score;
+      return false;
     }
     merge(arena, player);
     playerReset();
@@ -321,7 +319,9 @@ function playerMove(offset) {
   player.pos.x += offset;
   if (collide(arena, player)) {
     player.pos.x -= offset;
+    return false
   }
+  return true
 }
 
 /**
@@ -330,7 +330,7 @@ function playerMove(offset) {
  */
 
 function playerReset(type) {
-  pieces += type ? 0 : 1
+  pieces += type ? 0 : 1;
   if (disableJustHold) {
     justHold = false;
     disableJustHold = false;
@@ -349,9 +349,11 @@ function playerReset(type) {
       : player.matrix[0].length / 2 + 1) |
       0);
   if (collide(arena, player)) {
-    pieces = 0
-    lines = 0
-    startTime = Date.now()
+    justHold = false;
+    disableJustHold = false;
+    pieces = 0;
+    lines = 0;
+    startTime = Date.now();
     bag = [];
     nextbag = [];
     holdPiece = null;
@@ -368,10 +370,29 @@ function playerReset(type) {
  */
 
 function playerRotate(dir) {
+  dropCounter = 0;
   if (dir == 2) {
-    rotate(player.matrix, dir)
-    if (collide(arena, player)) {
+    var endRotate =
+      player.rotation + dir < 0
+        ? player.rotation + dir + 4
+        : player.rotation + dir;
+    endRotate %= 4;
+    const table =
+      player.pieceType == "I"
+        ? ISRSX[`${player.rotation}>>${endRotate}`]
+        : SRSX[`${player.rotation}>>${endRotate}`];
+    console.log(`${player.rotation}>>${endRotate}`, table);
+    for (var rotation in table) {
+      player.pos.x += table[rotation][0];
+      player.pos.y += table[rotation][1];
       rotate(player.matrix, dir);
+      if (collide(arena, player)) {
+        rotate(player.matrix, dir);
+        player.pos.x -= table[rotation][0];
+        player.pos.y -= table[rotation][1];
+      } else {
+        break;
+      }
     }
   } else {
     const table = player.pieceType == "I" ? ISRS : regularSRS;
@@ -412,6 +433,7 @@ let lastTime = 0;
 function update(time = 0) {
   const deltaTime = time - lastTime;
 
+
   dropCounter += deltaTime;
   if (dropCounter > dropInterval) {
     playerDrop(0);
@@ -419,8 +441,11 @@ function update(time = 0) {
 
   lastTime = time;
   if (lines < 40) {
-    document.getElementById("time").innerText = `Time elapsed: ${Math.floor((Date.now() - startTime) / 60000)}:${(Date.now() - startTime) / 1000}`
-    document.getElementById("pps").innerText = "PPS: " + (pieces / ((Date.now() - startTime) / 1000)).toFixed(2)
+    document.getElementById("time").innerText = `Time elapsed: ${Math.floor(
+      (Date.now() - startTime) / 60000
+    )}:${((Date.now() - startTime) % 60000) / 1000}`;
+    document.getElementById("pps").innerText =
+      "PPS: " + (pieces / ((Date.now() - startTime) / 1000)).toFixed(2);
   }
   draw();
   requestAnimationFrame(update);
@@ -448,8 +473,8 @@ const player = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  startTime = Date.now()
-  pieces = 1
+  startTime = Date.now();
+  pieces = 1;
   canvas = document.getElementById("tetris");
   context = canvas.getContext("2d");
 
@@ -469,9 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   lines = 0;
 
-  (bag = []),
-    (nextbag = []),
-  holdPiece = null;
+  (bag = []), (nextbag = []), (holdPiece = null);
   justHold = false;
   disableJustHold = false;
 

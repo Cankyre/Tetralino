@@ -9,7 +9,7 @@
       <div id="score"></div>
       <div class="board">
         <canvas id="hold" width="100" height="100"></canvas>
-        <div id="stats">  
+        <div id="stats">
           <p id="lines">Lines cleared: 0</p>
           <p id="pps">PPS: 0</p>
           <p id="time">Time elapsed: 0</p>
@@ -17,14 +17,20 @@
         <canvas id="tetris" width="200" height="400"></canvas>
         <canvas id="nextQueue" width="100" height="300"></canvas>
       </div>
-    </div>  
-    <div class="inputs">
-      <div class="field">
-        <input type="text" title="inputs" id="input" />
-        <button id="keysSubmit">Submit</button>
-      </div>
-      <p>We'll see later</p>
     </div>
+    </div>
+    <div id="tabMenu">
+      <div class="overlayBtn">
+        <div class="inputs">
+          <div class="field">
+            <input type="text" title="inputs" id="input" />
+            <button id="keysSubmit">Submit</button>
+          </div>
+          <p>We'll see later</p>
+      </div>
+    </div>
+    <script src="./js/ui.js"></script>
+    <script src="./js/neutralino.js"></script>
     <script src="./js/constants.js"></script>
     <script src="./js/controls.js"></script>
     <script src="./js/tetris.js"></script>
